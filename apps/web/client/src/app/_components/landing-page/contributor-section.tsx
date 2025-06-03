@@ -11,6 +11,7 @@ interface Contributor {
 
 // Floating Circles: two concentric rings
 const FloatingRings = () => {
+    const [isMounted, setIsMounted] = React.useState(false);
     const [isMd, setIsMd] = React.useState(
         typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : false
     );
@@ -57,6 +58,12 @@ const FloatingRings = () => {
     const innerRingCount = isMd ? 24 : Math.floor(24 * 0.6);
     const outerRingCount = isMd ? 30 : Math.floor(30 * 0.6);
 
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+    
+    if (!isMounted) return null;
+    
     return (
         <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 aspect-square pointer-events-none"

@@ -1,0 +1,8 @@
+{
+
+}
+127.0.0.1.nip.io, http://, https:// {
+encode gzip zstd
+reverse_proxy http://web:8000
+reverse_proxy http://livestream:8666
+}
