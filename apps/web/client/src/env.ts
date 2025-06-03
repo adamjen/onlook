@@ -37,6 +37,7 @@ export const env = createEnv({
     runtimeEnv: {
         NODE_ENV: process.env.NODE_ENV,
         LM_STUDIO_API_KEY: process.env.LM_STUDIO_API_KEY,
+        LM_STUDIO_BASE_URL: process.env.LM_STUDIO_BASE_URL,
         ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
         CSB_API_KEY: process.env.CSB_API_KEY,
         RESEND_API_KEY: process.env.RESEND_API_KEY,
