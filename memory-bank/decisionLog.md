@@ -17,3 +17,6 @@ YYYY-MM-DD HH:MM:SS - Log of updates made.
 ## Implementation Details
 
 *
+[2025-06-03 18:45:36] - Decision: Added LM Studio as a new LLM provider
+Rationale: To enable local model testing with OpenAI-compatible API
+Implementation: Created provider function in providers.ts, updated LLMProvider enum, added ENV vars

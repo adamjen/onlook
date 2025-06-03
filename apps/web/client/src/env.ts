@@ -10,6 +10,7 @@ export const env = createEnv({
         NODE_ENV: z.enum(['development', 'test', 'production']),
         ANTHROPIC_API_KEY: z.string(),
         LM_STUDIO_API_KEY: z.string().optional(),
+        LM_STUDIO_BASE_URL: z.string().url().default('http://localhost:1234/v1'),
         CSB_API_KEY: z.string(),
         SUPABASE_DATABASE_URL: z.string().url(),
         RESEND_API_KEY: z.string().optional(),

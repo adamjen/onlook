@@ -1,5 +1,6 @@
 export enum LLMProvider {
     ANTHROPIC = 'anthropic',
+    LM_STUDIO = 'lm-studio',
 }
 
 export enum CLAUDE_MODELS {

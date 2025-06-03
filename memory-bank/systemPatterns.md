@@ -18,3 +18,9 @@ YYYY-MM-DD HH:MM:SS - Log of updates made.
 ## Testing Patterns
 
 *
+[2025-06-03 18:47:23] - Pattern: Extensible LLM Provider Architecture
+Description: New providers can be added by:
+1. Creating provider function in providers.ts
+2. Adding to LLMProvider enum
+3. Implementing initModel switch case
+4. Adding environment variables
