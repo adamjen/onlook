@@ -19,7 +19,7 @@
     "scripts": {
         "build": "bun --filter @onlook/web build:client",
         "start": "bun --filter @onlook/web start:client",
-        "dev": "bun --filter @onlook/web dev",
+        "dev": "concurrently -n client,server,preload,template -c bgBlue,bgGreen,bgMagenta,bgYellow \"SERVER_PORT=8080 bun --filter '@onlook/web-server' dev\" \"PRELOAD_PORT=8081 bun --filter '@onlook/web-preload' dev\" \"TEMPLATE_PORT=8082 bun --filter '@onlook/web-template' dev\" \"CLIENT_PORT=3000 bun --filter '@onlook/web-client' dev\"",
         "test": "bun --filter '*' test",
         "docs": "bun --filter @onlook/docs dev",
         "backend:start": "bun --filter @onlook/backend start",
@@ -46,11 +46,17 @@
         "url": "https://github.com/onlook-dev/onlook/issues"
     },
     "devDependencies": {
+        "concurrently": "^9.1.2",
         "extract-zip": "^2.0.1",
         "husky": "^9.1.6",
         "msw": "^2.9.0"
     },
     "dependencies": {
+        "@playwright/test": "^1.52.0",
+        "@posthog/clickhouse": "^1.7.0",
+        "@posthog/plugin-scaffold": "^1.7.1",
+        "kea-test-utils": "^0.2.4",
+        "luxon": "^3.6.1",
         "posthog-node": "^4.18.0"
     },
     "packageManager": "bun@1.2.13"

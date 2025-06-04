@@ -2,10 +2,42 @@ import { IGNORED_DIRECTORIES, JSX_FILE_EXTENSIONS } from '@onlook/constants';
 import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test';
 
 // Setup mocks before imports
-// Mock localforage before importing anything that uses it
+// Configure localforage before importing anything that uses it
 const mockGetItem = mock<(key: string) => Promise<any>>(async () => null);
 const mockSetItem = mock<(key: string, value: any) => Promise<any>>(async () => undefined);
 const mockRemoveItem = mock<(key: string) => Promise<any>>(async () => undefined);
+
+const mockSession = {
+    fs: {
+        readdir: mock(async () => []),
+        readTextFile: mock(async () => ''),
+        writeFile: mock(async () => undefined),
+        mkdir: mock(async () => undefined),
+        stat: mock(async () => ({})),
+        watch: mock(async () => ({})),
+        unwatch: mock(async () => undefined)
+    },
+    editorEngine: {}
+};
+const mockWatcher = {};
+const mockFileSync = {
+    readOrFetch: mock(async () => ''),
+    write: mock(async () => true),
+    clear: mock(async () => undefined),
+    updateCache: mock(async () => undefined),
+    syncFromRemote: mock(async () => true),
+    delete: mock(async () => undefined)
+};
+
+mock.module('localforage', () => ({
+    config: mock(() => ({})),
+    getItem: mockGetItem,
+    setItem: mockSetItem,
+    removeItem: mockRemoveItem,
+    ready: mock(async () => undefined),
+    defineDriver: mock(() => Promise.resolve()),
+    setDriver: mock(() => Promise.resolve())
+}));
 
 // Mock FileSyncManager before importing SandboxManager or any code that uses it
 const mockReadOrFetch = mock(async (path: string) => '<div>Mocked Content</div>');
@@ -16,9 +48,6 @@ import { SandboxManager } from '../../src/components/store/editor/sandbox';
 
 describe('SandboxManager', () => {
     let sandboxManager: SandboxManager;
-    let mockSession: any;
-    let mockWatcher: any;
-    let mockFileSync: any;
 
     beforeEach(() => {
         mockGetItem.mockClear();
@@ -36,7 +65,10 @@ describe('SandboxManager', () => {
                 readOrFetch = mockReadOrFetch;
                 write = mockWrite;
                 clear = mockClear;
-            },
+                updateCache = mock(async () => undefined);
+                syncFromRemote = mock(async () => true);
+                delete = mock(async () => undefined);
+            }
         }));
 
         mock.module('@onlook/parser', () => ({
@@ -100,7 +132,7 @@ describe('SandboxManager', () => {
             },
         };
 
-        sandboxManager = new SandboxManager();
+        sandboxManager = new SandboxManager(mockSession.editorEngine);
     });
 
     afterEach(() => {
@@ -129,8 +161,7 @@ describe('SandboxManager', () => {
             },
         };
 
-        const testManager = new SandboxManager();
-        testManager.init(testMockSession);
+        const testManager = new SandboxManager(testMockSession.editorEngine);
 
         const files = await testManager.listFilesRecursively(
             './',
@@ -138,11 +169,11 @@ describe('SandboxManager', () => {
             JSX_FILE_EXTENSIONS,
         );
 
-        expect(testMockSession.fs.readdir.mock.calls.length).toBeGreaterThan(0);
+        expect(testMockSession.fs.readdir).toHaveBeenCalledWith('./');
         expect(testMockSession.fs.readdir.mock.calls.some((call) => call[0] === './')).toBe(true);
         expect(testMockSession.fs.readdir.mock.calls.some((call) => call[0] === 'src')).toBe(true);
 
-        expect(files).toEqual(['file1.tsx', 'file2.tsx', 'src/component.tsx']);
+        expect(files).toEqual(['./file1.tsx', './file2.tsx', './src/component.tsx']);
     });
 
     test('should read file content', async () => {
@@ -164,11 +195,16 @@ describe('SandboxManager', () => {
             'file1.tsx',
             '<div id="123">Modified Component</div>',
         );
-        expect(result).toBe(true);
-        expect(mockFileSync.write).toHaveBeenCalledWith(
+
+        const result = await sandboxManager.writeFile(
             'file1.tsx',
             '<div id="123">Modified Component</div>',
-            expect.any(Function),
+        );
+        expect(result).toBe(true);
+        expect(mockFileSync.write).toHaveBeenCalledWith(
+            './file1.tsx',
+            '<div id="123">Modified Component</div>',
+            expect.any(Function)
         );
     });
 
@@ -202,8 +238,7 @@ describe('SandboxManager', () => {
             },
         };
 
-        const errorManager = new SandboxManager();
-        errorManager.init(errorSession);
+        const errorManager = new SandboxManager(errorSession.editorEngine);
 
         // We need to create a custom fileSync mock that returns null for this test
         const errorFileSync = {

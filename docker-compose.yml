@@ -72,8 +72,11 @@ services:
             KAFKA_LOG_RETENTION_MS: 3600000
             KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
             KAFKA_LOG_RETENTION_HOURS: 1
+#            KAFKA_OPTS: "-Djava.security.egd=file:/dev/./urandom"  # Optional JVM tweak, commented out as handled by script
         volumes:
             - kafka-data:/bitnami/kafka
+        restart: "no" # <--- IMPORTANT CHANGE: Prevent Compose from starting Kafka
+
 
     worker:
         extends:
@@ -89,6 +92,10 @@ services:
             SESSION_RECORDING_V2_S3_ENDPOINT: http://objectstorage:19000
             OBJECT_STORAGE_ENABLED: true
             ENCRYPTION_SALT_KEYS: 8b974aebd218b2c200e020afe3cccf06
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
         image: posthog/posthog:latest
     web:
         extends:
@@ -120,6 +127,10 @@ services:
         extends:
             file: docker-compose.base.yml
             service: plugins
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
         image: posthog/posthog:latest
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'

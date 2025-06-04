@@ -1,16 +1,27 @@
-import OpenAI from 'openai';
+interface LLMClient {
+    chat: {
+        completions: {
+            create: (params: any) => Promise<any>;
+        };
+    };
+}
 
 const createPrompt = (originalCode: string, updateSnippet: string) => `<code>${originalCode}</code>
 <update>${updateSnippet}</update>`;
 
 export class FastApplyClient {
-    private readonly client: OpenAI;
+    protected client: LLMClient;
 
-    constructor(apiKey: string) {
-        this.client = new OpenAI({
-            apiKey,
-            baseURL: 'https://api.morphllm.com/v1',
-        });
+    constructor(apiKey: string, client?: LLMClient) {
+        if (client) {
+            this.client = client;
+        } else {
+            const openai = new (require('openai').OpenAI)({
+                apiKey,
+                baseURL: 'https://api.morphllm.com/v1',
+            });
+            this.client = openai;
+        }
     }
 
     async applyCodeChange(originalCode: string, updateSnippet: string): Promise<string | null> {

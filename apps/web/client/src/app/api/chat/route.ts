@@ -10,8 +10,8 @@ export enum ChatType {
 }
 
 export async function POST(req: Request) {
-    const { messages, maxSteps, chatType } = await req.json();
-    const model = await initModel(LLMProvider.ANTHROPIC, CLAUDE_MODELS.SONNET_4);
+    const { messages, maxSteps, chatType, provider = LLMProvider.ANTHROPIC, modelName = CLAUDE_MODELS.SONNET_4 } = await req.json();
+    const model = await initModel(provider, modelName);
     const systemPrompt = chatType === ChatType.CREATE ? getCreatePageSystemPrompt() : getSystemPrompt();
 
     const result = streamText({

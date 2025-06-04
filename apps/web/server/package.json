@@ -4,7 +4,7 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "dev": "bun run --watch src/index.ts",
+        "dev": "SERVER_PORT=$SERVER_PORT bun run --watch src/index.ts",
         "build": "bun build src/index.ts --outdir dist --target bun",
         "start": "bun dist/index.js",
         "preview": "bun run build && bun run start"

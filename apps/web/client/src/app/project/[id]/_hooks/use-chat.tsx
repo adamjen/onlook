@@ -2,6 +2,7 @@ import { ChatType } from '@/app/api/chat/route';
 import { useEditorEngine } from '@/components/store/editor';
 import type { EditorEngine } from '@/components/store/editor/engine';
 import { useChat, type UseChatHelpers } from '@ai-sdk/react';
+import { LLMProvider } from '@onlook/models';
 import {
     LIST_FILES_TOOL_NAME,
     LIST_FILES_TOOL_PARAMETERS,
@@ -39,6 +40,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         return chat.reload({
             body: {
                 chatType: type,
+                provider: LLMProvider.LM_STUDIO,
+                modelName: 'local-model'
             },
         });
     };

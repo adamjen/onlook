@@ -104,6 +104,12 @@ services:
     zookeeper:
         image: zookeeper:3.7.0
         restart: on-failure
+        healthcheck:
+            test: ['CMD', 'bash', '-c', 'echo stat | nc localhost 2181']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s # Give it some time to start up initially
 
     kafka:
         image: ghcr.io/posthog/kafka-container:v2.8.2

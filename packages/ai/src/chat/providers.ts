@@ -1,5 +1,5 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { OpenAI } from 'openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { CLAUDE_MODELS, LLMProvider } from '@onlook/models';
 import { assertNever } from '@onlook/utility';
 import { type LanguageModelV1 } from 'ai';
@@ -32,12 +32,9 @@ async function getAnthropicProvider(model: CLAUDE_MODELS | string): Promise<Lang
 }
 
 async function getLMStudioProvider(model: string): Promise<LanguageModelV1> {
-    const openai = new OpenAI({
+    const openai = createOpenAI({
         baseURL: process.env.LM_STUDIO_BASE_URL || 'http://localhost:1234/v1',
         apiKey: process.env.LM_STUDIO_API_KEY || 'none',
     });
-    return openai.chat.completions.create({
-        model,
-        messages: [],
-    }) as unknown as LanguageModelV1;
+    return openai(model);
 }
